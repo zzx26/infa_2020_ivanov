@@ -78,8 +78,8 @@ def cobweb(x, y, scale=1.0):
 
 
 # добавь паутину в 2-3 местах на доме
-def house():
-    return None
+def house(x, y, scale=1.0):
+
 
 
 def cloud(x, y, grayness=0.0, scale=1.0):
