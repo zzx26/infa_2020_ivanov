@@ -140,11 +140,13 @@ def cloud(x, y, grayness=0.0, scale=1.0):
     screen.blit(s, (0, 0))
 
 
-house(100, 300)
-house(250, 500, scale=0.7)
-# moon(300, 100)
-# cloud(70, 100, grayness=0.8, scale=3)
-# cloud(90, 400, grayness=0.9, scale=2.2)
+moon(420, 100, R=60)
+cloud(270, 200, grayness=0.65, scale=2.5)
+house(30, 400, scale=1.2)
+cloud(150, 80, grayness=0.8, scale=2.8)
+cloud(90, 120, grayness=0.45, scale=2.2)
+cloud(50, 190, grayness=0.75, scale=2.7)
+ghost(330, 550, 0.65)
 # cobweb(150, 150, 0.5)
 # ghost(200, 200, orientation=False)
 # ghost(200, 200, 0.75)
