@@ -10,12 +10,27 @@ FPS = 15
 screen_width = 500
 screen_height = 700
 screen = pygame.display.set_mode((screen_width, screen_height))
-d.rect(screen, (150, 150, 150), (0, 0, 500, 700))
 
-brown = (100, 30, 0)
+brown = (75, 45, 0)
 pale_transparent = (215, 215, 255, 200)
 black = (0, 0, 0)
 white = (255, 255, 255)
+window_color = (40, 70, 50)
+dark_gray = (20, 22, 20)
+yellow = (255, 255, 0)
+
+d.rect(screen, (100, 100, 100), (0, 0, 500, 300))
+d.rect(screen, black, (0, 300, 500, 400))
+
+
+def coinflip(length):
+    A = []
+    for i in range(length):
+        if (rnd.random() - 0.5) > 0:
+            A.append(1)
+        else:
+            A.append(0)
+    return A
 
 
 # function takes only the shape of the ghost from image, else is done via pygame tools
@@ -79,7 +94,43 @@ def cobweb(x, y, scale=1.0):
 
 # добавь паутину в 2-3 местах на доме
 def house(x, y, scale=1.0):
-
+    width = int(220 * scale)
+    height = int(130 * scale)
+    d.rect(screen, brown, (x, y, width, height))
+    for i in range(11):
+        if i % 2 == 0:
+            clr = brown
+        else:
+            clr = window_color
+        d.rect(screen, clr, (x + i * width // 11, y - height, width // 11, height))
+    d.rect(screen, dark_gray, (x - int(20 * scale), y + 5, int(width + 40 * scale), height // 8))
+    for i in range(7):
+        d.rect(screen, dark_gray, (x - int(20 * scale) + int((width + 40 * scale) * (2 * i + 0.25) / 13),
+                                   y + 5 - height // 4, width // 26, height // 4))
+    d.rect(screen, dark_gray, (x - int(20 * scale), y + 5 - height // 4, int(width + 40 * scale), height // 12))
+    flp = coinflip(3)
+    for i in range(3):
+        if flp[i] == 1:
+            clr = yellow
+        else:
+            clr = window_color
+        d.rect(screen, clr, (x + width * (2 * i + 1) // 7, y + height // 3, width // 7, height // 3))
+    d.rect(screen, dark_gray, (x, y - height, width, height // 6))
+    d.polygon(screen, dark_gray, ((x - int(30 * scale), y - height + height // 6),
+                                  (x, y - height + height // 6), (x, y - height)))
+    d.polygon(screen, dark_gray, ((x + width + int(30 * scale), y - height + height // 6),
+                                  (x + width, y - height + height // 6), (x + width, y - height)))
+    for i in range(int(6 * rnd.random())):
+        d.rect(screen, (40, 42, 40), (x + int(width * rnd.random()), y - height + int(0.12 * height * rnd.random()),
+                                      int(width / 10 * rnd.random()) + 3, -int(height / 3 * rnd.random()) - 20))
+    cords = [(x + int(22*scale), y + int(35*scale)), (x + int(195*scale), y + int(105*scale)),
+             (x + int(40*scale), y - int(90*scale)), (x + int(180*scale), y - int(50*scale))]
+    probs = coinflip(4)
+    for i in range(len(cords)):
+        if probs[i] == 1:
+            a, b = cords[i]
+            print(a, b)
+            cobweb(a, b, 0.45*scale)
 
 
 def cloud(x, y, grayness=0.0, scale=1.0):
@@ -89,12 +140,14 @@ def cloud(x, y, grayness=0.0, scale=1.0):
     screen.blit(s, (0, 0))
 
 
-moon(300, 100)
-cloud(70, 100, grayness=0.8, scale=3)
-cloud(90, 400, grayness=0.9, scale=2.2)
-cobweb(150, 150, 0.5)
-ghost(200, 200, orientation=False)
-ghost(200, 200, 0.75)
+house(100, 300)
+house(250, 500, scale=0.7)
+# moon(300, 100)
+# cloud(70, 100, grayness=0.8, scale=3)
+# cloud(90, 400, grayness=0.9, scale=2.2)
+# cobweb(150, 150, 0.5)
+# ghost(200, 200, orientation=False)
+# ghost(200, 200, 0.75)
 
 pygame.display.update()
 clock = pygame.time.Clock()
