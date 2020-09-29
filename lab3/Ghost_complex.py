@@ -139,6 +139,7 @@ def cloud(x, y, grayness=0.0, scale=1.0):
     screen.blit(s, (0, 0))
 
 
+
 moon(420, 100, R=60)
 cloud(270, 200, grayness=0.65, scale=2.5)
 house(330, 280, scale=0.7)
