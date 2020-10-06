@@ -4,12 +4,12 @@ import random as rnd
 
 pygame.init()
 
-FPS = 2
+FPS = 120
 screen_width = 1100
 screen_height = 700
 screen = pygame.display.set_mode((screen_width, screen_height))
 max_ball_r = 75
-velocity_max = 1
+velocity_max = 10
 
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
@@ -46,10 +46,10 @@ def ball_movement(init_ball_data: tuple):
     color = init_ball_data[3]
     v_x = init_ball_data[4]
     v_y = init_ball_data[5]
-    for i in range(40 * FPS):
+    for i in range(FPS*2):
+        clock.tick(FPS)
         x = v_x + x
         y = v_y + y
-
         d.circle(screen, color, (x, y), r)
         pygame.display.update()
         screen.fill(BLACK)
@@ -81,7 +81,7 @@ clock = pygame.time.Clock()
 finished = False
 
 while not finished:
-    clock.tick(FPS)
+    clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             finished = True
