@@ -2,9 +2,11 @@ import pygame
 import pygame.draw as d
 import random as rnd
 
+# Сделай дома через ооп
+
 pygame.init()
 
-FPS = 120
+FPS = 25
 screen_width = 1100
 screen_height = 700
 screen = pygame.display.set_mode((screen_width, screen_height))
@@ -19,76 +21,141 @@ MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+counter = 0
 
 
-def new_ball(max_r: int):
+class Ball(object):
     """
-    рисует новый шарик
-    contains all variables in tuple
+    Ball object for "screen" plane. Can be moved and deleted
     """
-    x = rnd.randint(max_r, screen_width - max_r)
-    y = rnd.randint(max_r, screen_height - max_r)
-    r = rnd.randint(10, max_r)
-    color = COLORS[rnd.randint(0, 5)]
-    v_x = rnd.randint(-velocity_max, velocity_max)
-    v_y = rnd.randint(-velocity_max, velocity_max)
-    d.circle(screen, color, (x, y), r)
-    new_ball.data = (x, y, r, color, v_x, v_y)
+
+    def __init__(self, r):
+        max_r = r
+        self.x = rnd.randint(max_r, screen_width - max_r)
+        self.y = rnd.randint(max_r, screen_height - max_r)
+        self.r = rnd.randint(15, max_r)
+        self.color = COLORS[rnd.randint(0, 5)]
+        self.v_x = rnd.randint(-velocity_max, velocity_max)
+        self.v_y = rnd.randint(-velocity_max, velocity_max)
+
+    def new_ball(self):
+        """
+        Creates a new Ball
+
+        :return: an image on "screen" plane
+        """
+        d.circle(screen, self.color, (self.x, self.y), self.r)
+
+    def ball_movement(self):
+        """
+        Defines Ball movement
+
+        :return: an image on "screen" plane
+        """
+        if self.x > (screen_width - self.r):
+            self.v_x = rnd.randint(-velocity_max, 0)
+        elif self.x < self.r:
+            self.v_x = rnd.randint(0, velocity_max)
+        elif self.y < self.r:
+            self.v_y = rnd.randint(0, velocity_max)
+        elif self.y > (screen_height - self.r):
+            self.v_y = rnd.randint(-velocity_max, 0)
+        self.x = self.x + self.v_x
+        self.y = self.y + self.v_y
+        d.circle(screen, self.color, (self.x, self.y), self.r)
+
+    def ball_cords(self, cords: tuple):
+        """
+        Compares ball cords to given cords
+
+        :return: bool type
+        """
+        if ((cords[0] - self.x)**2 + (cords[1] - self.y)**2) <= self.r**2:
+            return True
+        else:
+            return False
+
+    def ball_exterminate(self):
+        self.x, self.y = 2000, 2000
 
 
-def ball_movement(init_ball_data: tuple):
+class Star(object):
     """
-    creates movement of a given ball
+    Should've been ball subclass, bit it's too late to change and is out of my skill range
     """
-    x = init_ball_data[0]
-    y = init_ball_data[1]
-    r = init_ball_data[2]
-    color = init_ball_data[3]
-    v_x = init_ball_data[4]
-    v_y = init_ball_data[5]
-    for i in range(FPS*2):
-        clock.tick(FPS)
-        x = v_x + x
-        y = v_y + y
-        d.circle(screen, color, (x, y), r)
-        pygame.display.update()
-        screen.fill(BLACK)
+    def __init__(self, r):
+        max_r = r
+        self.x = rnd.randint(max_r, screen_width - max_r)
+        self.y = rnd.randint(max_r, screen_height - max_r)
+        self.r = rnd.randint(15, max_r)
+        self.color = COLORS[rnd.randint(0, 5)]
+        self.v_x = rnd.randint(-velocity_max, velocity_max)
+        self.v_y = rnd.randint(-velocity_max, velocity_max)
 
-        if x < r:
-            v_x = rnd.randint(0, velocity_max)
-            v_y = rnd.randint(-velocity_max, velocity_max)
-        elif x > (screen_width - r):
-            v_x = rnd.randint(-velocity_max, 0)
-            v_y = rnd.randint(-velocity_max, velocity_max)
-        elif y < r:
-            v_y = rnd.randint(0, velocity_max)
-            v_x = rnd.randint(-velocity_max, velocity_max)
-        elif y > (screen_height - r):
-            v_y = rnd.randint(-velocity_max, 0)
-            v_x = rnd.randint(-velocity_max, velocity_max)
+    def new_ball(self):
+        """
+        Creates a new Star
+
+        :return: an image on "screen" plane
+        """
+        d.polygon(screen, self.color, (self.x, self.y))
 
 
-def ball_object(data, max_r: int):
-    """
-    создает newballом шарик, двигает и перерисовывает movementом
-    :return:
-    """
-    return None
-
+circle_1 = Ball(max_ball_r)
+circle_2 = Ball(max_ball_r)
+obj_3 = Ball(max_ball_r)
+restart = 0
+player_score = 0
 
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
 
 while not finished:
-    clock.tick(60)
+    clock.tick(FPS)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            print('FINAL SCORE:', player_score)
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            print('Click!')
+            if circle_1.ball_cords(pygame.mouse.get_pos()):
+                circle_1.ball_exterminate()
+                restart += 1
+                player_score += 1
+            if circle_2.ball_cords(pygame.mouse.get_pos()):
+                circle_2.ball_exterminate()
+                restart += 1
+                player_score += 1
+            if obj_3.ball_cords(pygame.mouse.get_pos()):
+                obj_3.ball_exterminate()
+                restart += 1
+                player_score += 1
+            if restart % 3 == 0:
+                if restart != 0:
+                    counter = 0
 
-    new_ball(max_ball_r)
-    ball_movement(new_ball.data)
+    if counter < 4*FPS and counter != 0:
+        screen.fill(BLACK)
+        circle_1.ball_movement()
+        circle_2.ball_movement()
+        obj_3.ball_movement()
+        counter += 1
+        screen.blit(text_score, (0, 0))
+        pygame.display.update()
+    else:
+        screen.fill(BLACK)
+        counter = 0
+        restart = 0
+        circle_1 = Ball(max_ball_r)
+        circle_2 = Ball(max_ball_r)
+        obj_3 = Ball(max_ball_r)
+        circle_1.new_ball()
+        counter = 1
+        player_score_str = str(player_score)
+        f1 = pygame.font.Font(None, 72)
+        text_score = f1.render(player_score_str, 0, RED)
+        screen.blit(text_score, (5, 5))
+        pygame.display.update()
+
 
 pygame.quit()
