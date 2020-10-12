@@ -20,6 +20,7 @@ GREEN = (0, 255, 0)
 MAGENTA = (255, 0, 255)
 CYAN = (0, 255, 255)
 BLACK = (0, 0, 0)
+TRANSPARENT = (255, 255, 255, 0)
 COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 counter = 0
 
@@ -76,6 +77,9 @@ class Ball(object):
             return False
 
     def ball_exterminate(self):
+        """
+        Makes Ball disappear
+        """
         self.x, self.y = 2000, 2000
 
 
@@ -98,12 +102,61 @@ class Star(object):
 
         :return: an image on "screen" plane
         """
-        d.polygon(screen, self.color, (self.x, self.y))
+        temp_surf = pygame.Surface((2*self.r, 2*self.r))
+        temp_surf.fill(TRANSPARENT)
+        d.polygon(temp_surf, self.color, ((self.r, 0), (self.r + self.r//5, self.r - self.r//5), (2*self.r, self.r),
+                                          (self.r + self.r//5, self.r + self.r//5), (self.r, 2*self.r),
+                                          (self.r - self.r//5, self.r + self.r//5), (0, self.r),
+                                          (self.r - self.r//5, self.r - self.r//5), (self.r, 0)))
+        temp_surf.set_colorkey(TRANSPARENT)
+        screen.blit(temp_surf, (self.x + self.r, self.y + self.r))
+
+    def ball_movement(self):
+        """
+        Defines Star movement
+
+        :return: an image on "screen" plane
+        """
+        if self.x > (screen_width - 3*self.r):
+            self.v_x = rnd.randint(-velocity_max, 0)
+        elif self.x < -self.r:
+            self.v_x = rnd.randint(0, velocity_max)
+        elif self.y < -self.r:
+            self.v_y = rnd.randint(0, velocity_max)
+        elif self.y > (screen_height - 3*self.r):
+            self.v_y = rnd.randint(-velocity_max, 0)
+        self.x = self.x + self.v_x
+        self.y = self.y + self.v_y
+        temp_surf = pygame.Surface((2*self.r, 2*self.r))
+        temp_surf.fill(TRANSPARENT)
+        d.polygon(temp_surf, self.color, ((self.r, 0), (self.r + self.r//5, self.r - self.r//5), (2*self.r, self.r),
+                                          (self.r + self.r//5, self.r + self.r//5), (self.r, 2*self.r),
+                                          (self.r - self.r//5, self.r + self.r//5), (0, self.r),
+                                          (self.r - self.r//5, self.r - self.r//5), (self.r, 0)))
+        temp_surf.set_colorkey(TRANSPARENT)
+        screen.blit(temp_surf, (self.x + self.r, self.y + self.r))
+
+    def ball_cords(self, cords: tuple):
+        """
+        Compares Star cords to given cords
+
+        :return: bool type
+        """
+        if ((cords[0] - self.x - 2*self.r)**2 + (cords[1] - self.y - 2*self.r)**2) <= (self.r//2)**2:
+            return True
+        else:
+            return False
+
+    def ball_exterminate(self):
+        """
+        Makes Star disappear
+        """
+        self.x, self.y = 2000, 2000
 
 
 circle_1 = Ball(max_ball_r)
 circle_2 = Ball(max_ball_r)
-obj_3 = Ball(max_ball_r)
+obj_3 = Star(max_ball_r)
 restart = 0
 player_score = 0
 
@@ -128,9 +181,9 @@ while not finished:
                 player_score += 1
             if obj_3.ball_cords(pygame.mouse.get_pos()):
                 obj_3.ball_exterminate()
-                restart += 1
-                player_score += 1
-            if restart % 3 == 0:
+                restart += 3
+                player_score += 3
+            if restart % 5 == 0:
                 if restart != 0:
                     counter = 0
 
@@ -140,7 +193,7 @@ while not finished:
         circle_2.ball_movement()
         obj_3.ball_movement()
         counter += 1
-        screen.blit(text_score, (0, 0))
+        screen.blit(text_score, (5, 5))
         pygame.display.update()
     else:
         screen.fill(BLACK)
@@ -148,8 +201,7 @@ while not finished:
         restart = 0
         circle_1 = Ball(max_ball_r)
         circle_2 = Ball(max_ball_r)
-        obj_3 = Ball(max_ball_r)
-        circle_1.new_ball()
+        obj_3 = Star(max_ball_r)
         counter = 1
         player_score_str = str(player_score)
         f1 = pygame.font.Font(None, 72)
