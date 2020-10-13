@@ -2,8 +2,6 @@ import pygame
 import pygame.draw as d
 import random as rnd
 
-# Сделай дома через ооп
-
 pygame.init()
 
 FPS = 25
@@ -38,6 +36,8 @@ class Target(object):
         self.color = COLORS[rnd.randint(0, 5)]
         self.v_x = rnd.randint(-velocity_max, velocity_max)
         self.v_y = rnd.randint(-velocity_max, velocity_max)
+        self.destroyed = False
+        self.var_anim = 0
 
     def new_ball(self):
         """
@@ -49,21 +49,35 @@ class Target(object):
 
     def ball_movement(self):
         """
-        Defines ball movement
+        Defines ball movement, makes pop animation upon destroying
 
         :return: an image on "screen" plane
         """
-        if self.x > (screen_width - self.r):
-            self.v_x = rnd.randint(-velocity_max, 0)
-        elif self.x < self.r:
-            self.v_x = rnd.randint(0, velocity_max)
-        elif self.y < self.r:
-            self.v_y = rnd.randint(0, velocity_max)
-        elif self.y > (screen_height - self.r):
-            self.v_y = rnd.randint(-velocity_max, 0)
-        self.x = self.x + self.v_x
-        self.y = self.y + self.v_y
-        d.circle(screen, self.color, (self.x, self.y), self.r)
+        if not self.destroyed:
+            if self.x > (screen_width - self.r):
+                self.v_x = rnd.randint(-velocity_max, 0)
+            elif self.x < self.r:
+                self.v_x = rnd.randint(0, velocity_max)
+            elif self.y < self.r:
+                self.v_y = rnd.randint(0, velocity_max)
+            elif self.y > (screen_height - self.r):
+                self.v_y = rnd.randint(-velocity_max, 0)
+            elif self.x > 1800:
+                self.v_x, self.v_y = 0, 0
+            self.x = self.x + self.v_x
+            self.y = self.y + self.v_y
+            d.circle(screen, self.color, (self.x, self.y), self.r)
+        elif self.var_anim <= 40:
+            print(self.x, self.y)
+            d.line(screen, self.color, (self.x - 10 - 2000 - self.var_anim, self.y - 2000),
+                   (self.x - 50 - 2000, self.y - 2000), 5)
+            d.line(screen, self.color, (self.x + 10 - 2000 + self.var_anim, self.y - 2000),
+                   (self.x + 50 - 2000, self.y - 2000), 5)
+            d.line(screen, self.color, (self.x - 2000, self.y - 10 - 2000 - self.var_anim),
+                   (self.x - 2000, self.y - 50 - 2000), 5)
+            d.line(screen, self.color, (self.x - 2000, self.y + 10 - 2000 + self.var_anim),
+                   (self.x - 2000, self.y + 50 - 2000), 5)
+            self.var_anim += 8
 
     def ball_cords(self, cords: tuple):
         """
@@ -80,7 +94,8 @@ class Target(object):
         """
         Makes Target disappear
         """
-        self.x, self.y = 2000, 2000
+        self.x, self.y = 2000 + self.x, self.y + 2000
+        self.destroyed = True
 
     def new_star(self):
         """
@@ -99,28 +114,40 @@ class Target(object):
 
     def star_movement(self):
         """
-        Defines star movement
+        Defines star movement, makes pop animation upon destroying
 
         :return: an image on "screen" plane
         """
-        if self.x > (screen_width - 3*self.r):
-            self.v_x = rnd.randint(-velocity_max, 0)
-        elif self.x < -self.r:
-            self.v_x = rnd.randint(0, velocity_max)
-        elif self.y < -self.r:
-            self.v_y = rnd.randint(0, velocity_max)
-        elif self.y > (screen_height - 3*self.r):
-            self.v_y = rnd.randint(-velocity_max, 0)
-        self.x = self.x + self.v_x
-        self.y = self.y + self.v_y
-        temp_surf = pygame.Surface((2*self.r, 2*self.r))
-        temp_surf.fill(TRANSPARENT)
-        d.polygon(temp_surf, self.color, ((self.r, 0), (self.r + self.r//5, self.r - self.r//5), (2*self.r, self.r),
-                                          (self.r + self.r//5, self.r + self.r//5), (self.r, 2*self.r),
-                                          (self.r - self.r//5, self.r + self.r//5), (0, self.r),
-                                          (self.r - self.r//5, self.r - self.r//5), (self.r, 0)))
-        temp_surf.set_colorkey(TRANSPARENT)
-        screen.blit(temp_surf, (self.x + self.r, self.y + self.r))
+        if not self.destroyed:
+            if self.x > (screen_width - 3*self.r):
+                self.v_x = rnd.randint(-velocity_max, 0)
+            elif self.x < -self.r:
+                self.v_x = rnd.randint(0, velocity_max)
+            elif self.y < -self.r:
+                self.v_y = rnd.randint(0, velocity_max)
+            elif self.y > (screen_height - 3*self.r):
+                self.v_y = rnd.randint(-velocity_max, 0)
+            self.x = self.x + self.v_x + int((rnd.random() - 0.5)*self.v_x*2)
+            self.y = self.y + self.v_y + int((rnd.random() - 0.5)*self.v_y*2)
+            temp_surf = pygame.Surface((2*self.r, 2*self.r))
+            temp_surf.fill(TRANSPARENT)
+            d.polygon(temp_surf, self.color, ((self.r, 0), (self.r + self.r//5, self.r - self.r//5), (2*self.r, self.r),
+                                              (self.r + self.r//5, self.r + self.r//5), (self.r, 2*self.r),
+                                              (self.r - self.r//5, self.r + self.r//5), (0, self.r),
+                                              (self.r - self.r//5, self.r - self.r//5), (self.r, 0)))
+            temp_surf.set_colorkey(TRANSPARENT)
+            screen.blit(temp_surf, (self.x + self.r, self.y + self.r))
+        elif self.var_anim <= self.r - 10:
+            print(self.x, self.y)
+            d.line(screen, self.color, (self.x - 10 - 2000 - self.var_anim + 2*self.r, self.y - 2000 + 2*self.r),
+                   (self.x - self.r - 2000 + 2*self.r, self.y - 2000 + 2*self.r), 3)
+            d.line(screen, self.color, (self.x + 10 - 2000 + self.var_anim + 2*self.r, self.y - 2000 + 2*self.r),
+                   (self.x + self.r - 2000 + 2*self.r, self.y - 2000 + 2*self.r), 3)
+            d.line(screen, self.color, (self.x - 2000 + 2*self.r, self.y - 10 - 2000 - self.var_anim + 2*self.r),
+                   (self.x - 2000 + 2*self.r, self.y - self.r - 2000 + 2*self.r), 3)
+            d.line(screen, self.color, (self.x - 2000 + 2*self.r, self.y + 10 - 2000 + self.var_anim + 2*self.r),
+                   (self.x - 2000 + 2*self.r, self.y + self.r - 2000 + 2*self.r), 3)
+            self.var_anim += 8
 
     def star_cords(self, cords: tuple):
         """
