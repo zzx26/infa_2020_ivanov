@@ -25,9 +25,9 @@ COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
 counter = 0
 
 
-class Ball(object):
+class Target(object):
     """
-    Ball object for "screen" plane. Can be moved and deleted
+    Target object for "screen" plane. Can be moved and deleted
     """
 
     def __init__(self, r):
@@ -41,7 +41,7 @@ class Ball(object):
 
     def new_ball(self):
         """
-        Creates a new Ball
+        Creates a new ball
 
         :return: an image on "screen" plane
         """
@@ -49,7 +49,7 @@ class Ball(object):
 
     def ball_movement(self):
         """
-        Defines Ball movement
+        Defines ball movement
 
         :return: an image on "screen" plane
         """
@@ -76,27 +76,13 @@ class Ball(object):
         else:
             return False
 
-    def ball_exterminate(self):
+    def target_exterminate(self):
         """
-        Makes Ball disappear
+        Makes Target disappear
         """
         self.x, self.y = 2000, 2000
 
-
-class Star(object):
-    """
-    Should've been ball subclass, bit it's too late to change and is out of my skill range
-    """
-    def __init__(self, r):
-        max_r = r
-        self.x = rnd.randint(max_r, screen_width - max_r)
-        self.y = rnd.randint(max_r, screen_height - max_r)
-        self.r = rnd.randint(15, max_r)
-        self.color = COLORS[rnd.randint(0, 5)]
-        self.v_x = rnd.randint(-velocity_max, velocity_max)
-        self.v_y = rnd.randint(-velocity_max, velocity_max)
-
-    def new_ball(self):
+    def new_star(self):
         """
         Creates a new Star
 
@@ -111,9 +97,9 @@ class Star(object):
         temp_surf.set_colorkey(TRANSPARENT)
         screen.blit(temp_surf, (self.x + self.r, self.y + self.r))
 
-    def ball_movement(self):
+    def star_movement(self):
         """
-        Defines Star movement
+        Defines star movement
 
         :return: an image on "screen" plane
         """
@@ -136,9 +122,9 @@ class Star(object):
         temp_surf.set_colorkey(TRANSPARENT)
         screen.blit(temp_surf, (self.x + self.r, self.y + self.r))
 
-    def ball_cords(self, cords: tuple):
+    def star_cords(self, cords: tuple):
         """
-        Compares Star cords to given cords
+        Compares star cords to given cords
 
         :return: bool type
         """
@@ -147,16 +133,10 @@ class Star(object):
         else:
             return False
 
-    def ball_exterminate(self):
-        """
-        Makes Star disappear
-        """
-        self.x, self.y = 2000, 2000
 
-
-circle_1 = Ball(max_ball_r)
-circle_2 = Ball(max_ball_r)
-obj_3 = Star(max_ball_r)
+circle_1 = Target(max_ball_r)
+circle_2 = Target(max_ball_r)
+obj_3 = Target(max_ball_r)
 restart = 0
 player_score = 0
 
@@ -172,15 +152,15 @@ while not finished:
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if circle_1.ball_cords(pygame.mouse.get_pos()):
-                circle_1.ball_exterminate()
+                circle_1.target_exterminate()
                 restart += 1
                 player_score += 1
             if circle_2.ball_cords(pygame.mouse.get_pos()):
-                circle_2.ball_exterminate()
+                circle_2.target_exterminate()
                 restart += 1
                 player_score += 1
-            if obj_3.ball_cords(pygame.mouse.get_pos()):
-                obj_3.ball_exterminate()
+            if obj_3.star_cords(pygame.mouse.get_pos()):
+                obj_3.target_exterminate()
                 restart += 3
                 player_score += 3
             if restart % 5 == 0:
@@ -191,7 +171,7 @@ while not finished:
         screen.fill(BLACK)
         circle_1.ball_movement()
         circle_2.ball_movement()
-        obj_3.ball_movement()
+        obj_3.star_movement()
         counter += 1
         screen.blit(text_score, (5, 5))
         pygame.display.update()
@@ -199,9 +179,9 @@ while not finished:
         screen.fill(BLACK)
         counter = 0
         restart = 0
-        circle_1 = Ball(max_ball_r)
-        circle_2 = Ball(max_ball_r)
-        obj_3 = Star(max_ball_r)
+        circle_1 = Target(max_ball_r)
+        circle_2 = Target(max_ball_r)
+        obj_3 = Target(max_ball_r)
         counter = 1
         player_score_str = str(player_score)
         f1 = pygame.font.Font(None, 72)
