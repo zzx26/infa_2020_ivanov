@@ -67,16 +67,15 @@ class Target(object):
             self.x = self.x + self.v_x
             self.y = self.y + self.v_y
             d.circle(screen, self.color, (self.x, self.y), self.r)
-        elif self.var_anim <= 40:
-            print(self.x, self.y)
+        elif self.var_anim <= self.r - 10:
             d.line(screen, self.color, (self.x - 10 - 2000 - self.var_anim, self.y - 2000),
-                   (self.x - 50 - 2000, self.y - 2000), 5)
+                   (self.x - self.r - 2000, self.y - 2000), 3)
             d.line(screen, self.color, (self.x + 10 - 2000 + self.var_anim, self.y - 2000),
-                   (self.x + 50 - 2000, self.y - 2000), 5)
+                   (self.x + self.r - 2000, self.y - 2000), 3)
             d.line(screen, self.color, (self.x - 2000, self.y - 10 - 2000 - self.var_anim),
-                   (self.x - 2000, self.y - 50 - 2000), 5)
+                   (self.x - 2000, self.y - self.r - 2000), 3)
             d.line(screen, self.color, (self.x - 2000, self.y + 10 - 2000 + self.var_anim),
-                   (self.x - 2000, self.y + 50 - 2000), 5)
+                   (self.x - 2000, self.y + self.r - 2000), 3)
             self.var_anim += 8
 
     def ball_cords(self, cords: tuple):
@@ -138,7 +137,6 @@ class Target(object):
             temp_surf.set_colorkey(TRANSPARENT)
             screen.blit(temp_surf, (self.x + self.r, self.y + self.r))
         elif self.var_anim <= self.r - 10:
-            print(self.x, self.y)
             d.line(screen, self.color, (self.x - 10 - 2000 - self.var_anim + 2*self.r, self.y - 2000 + 2*self.r),
                    (self.x - self.r - 2000 + 2*self.r, self.y - 2000 + 2*self.r), 3)
             d.line(screen, self.color, (self.x + 10 - 2000 + self.var_anim + 2*self.r, self.y - 2000 + 2*self.r),
@@ -161,6 +159,13 @@ class Target(object):
             return False
 
 
+def enter_name():
+    screen.fill(BLACK)
+    font = pygame.font.Font(None, 72)
+    text_inner = font.render('ENTER NAME IN CONSOLE', 0, RED)
+    screen.blit(text_inner, (0, 0))
+
+
 circle_1 = Target(max_ball_r)
 circle_2 = Target(max_ball_r)
 obj_3 = Target(max_ball_r)
@@ -170,6 +175,7 @@ player_score = 0
 pygame.display.update()
 clock = pygame.time.Clock()
 finished = False
+
 
 while not finished:
     clock.tick(FPS)
