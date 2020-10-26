@@ -63,7 +63,7 @@ class ball():
         self.y -= self.vy
         self.vx -= self.ax
 
-    def hittest(self, obj):
+    def collision(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
 
         Args:
@@ -72,14 +72,16 @@ class ball():
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
         # FIXME
-            return False
+        return False
+        #сделал функцию вытаскивания данных из хитбокса, с её помощью делай штуки
 
 
 class gun():
-    self.f2_power = 10
-    self.f2_on = 0
-    self.an = 1
-    # self.id = canv.create_line(20,450,50,420,width=7) # FIXME: don't know how to set it...
+    def __init__(self):
+        self.f2_power = 10
+        self.f2_on = 0
+        self.an = 1
+        # self.id = canv.create_line(20,450,50,420,width=7) # FIXME: don't know how to set it...
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -123,31 +125,38 @@ class gun():
             canv.itemconfig(self.id, fill='black')
 
 
-class target():
-    self.points = 0
-    self.live = 1
-    # FIXME: don't work!!! How to call this functions when object is created?
-    # self.id = canv.create_oval(0,0,0,0)
-    # self.id_points = canv.create_text(30,30,text = self.points,font = '28')
-    # self.new_target()
+class Target():
+    def __init__(self):
+        self.x = self.y = self.r = self.color = 0
+        self.score_value = 1
+        self.live = 1
+        self.id = canv.create_oval(0, 0 , 0 ,0)
+        # self.id_points = canv.create_text(30,30,text = self.score_value,font = '28')
+        # self.new_target()
+        # вытащи подсчет очков в отдельную штуку
 
     def new_target(self):
         """ Инициализация новой цели. """
-        x = self.x = rnd(600, 780)
-        y = self.y = rnd(300, 550)
-        r = self.r = rnd(2, 50)
-        color = self.color = 'red'
-        canv.coords(self.id, x-r, y-r, x+r, y+r)
+        self.x = rnd(600, 780)
+        self.y = rnd(300, 550)
+        self.r = rnd(2, 50)
+        self.color = 'red'
+        canv.coords(self.id, self.x-self.r, self.y-self.r, self.x+self.r, self.y+self.r)
         canv.itemconfig(self.id, fill=color)
+
+    def hitbox_data(self):
+        return self.x, self.y, self.r
 
     def hit(self, points=1):
         """Попадание шарика в цель."""
         canv.coords(self.id, -10, -10, -10, -10)
-        self.points += points
-        canv.itemconfig(self.id_points, text=self.points)
+        # canv.itemconfig( self.id_points, text=self.score_value )
+
+    def pull_score(self):
+        return self.score_value
 
 
-t1 = target()
+t1 = Target()
 screen1 = canv.create_text(400, 300, text='', font='28')
 g1 = gun()
 bullet = 0
@@ -168,7 +177,7 @@ def new_game(event=''):
     while t1.live or balls:
         for b in balls:
             b.move()
-            if b.hittest(t1) and t1.live:
+            if b.collision( t1 ) and t1.live:
                 t1.live = 0
                 t1.hit()
                 canv.bind('<Button-1>', '')
