@@ -41,7 +41,7 @@ class Target(object):
 
     def new_ball(self):
         """
-        Creates a new ball
+        Creates a new Ball
 
         :return: an image on "screen" plane
         """
@@ -49,7 +49,7 @@ class Target(object):
 
     def ball_movement(self):
         """
-        Defines ball movement, makes pop animation upon destroying
+        Defines Ball movement, makes pop animation upon destroying
 
         :return: an image on "screen" plane
         """
@@ -80,7 +80,7 @@ class Target(object):
 
     def ball_cords(self, cords: tuple):
         """
-        Compares ball cords to given cords
+        Compares Ball cords to given cords
 
         :return: bool type
         """

@@ -15,9 +15,9 @@ canv = tk.Canvas(root, bg='white')
 canv.pack(fill=tk.BOTH, expand=1)
 
 
-class ball():
+class Ball():
     def __init__(self, x=40, y=450):
-        """ Конструктор класса ball
+        """ Конструктор класса Ball
 
         Args:
         x - начальное положение мяча по горизонтали
@@ -76,15 +76,17 @@ class ball():
         #сделал функцию вытаскивания данных из хитбокса, с её помощью делай штуки
 
 
-class gun():
+class Gun():
     def __init__(self):
         self.f2_power = 10
-        self.f2_on = 0
+        self.f2_on = False
         self.an = 1
-        # self.id = canv.create_line(20,450,50,420,width=7) # FIXME: don't know how to set it...
+        self.id = canv.create_line(20, 450, 50, 420, width=7) # FIXME: don't know how to set it...
+        self.balls = []
+        self.bullet = 0
 
     def fire2_start(self, event):
-        self.f2_on = 1
+        self.f2_on = True
 
     def fire2_end(self, event):
         """Выстрел мячом.
@@ -92,14 +94,13 @@ class gun():
         Происходит при отпускании кнопки мыши.
         Начальные значения компонент скорости мяча vx и vy зависят от положения мыши.
         """
-        global balls, bullet
-        bullet += 1
-        new_ball = ball()
+        self.bullet += 1
+        new_ball = Ball()
         new_ball.r += 5
         self.an = math.atan((event.y-new_ball.y) / (event.x-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
-        balls += [new_ball]
+        self.balls += [new_ball]
         self.f2_on = 0
         self.f2_power = 10
 
@@ -158,16 +159,16 @@ class Target():
 
 t1 = Target()
 screen1 = canv.create_text(400, 300, text='', font='28')
-g1 = gun()
-bullet = 0
-balls = []
+g1 = Gun()
+
 
 
 def new_game(event=''):
-    global gun, t1, screen1, balls, bullet
+    global Gun, t1, screen1, balls, bullet
     t1.new_target()
     bullet = 0
     balls = []
+    # попытайся локализировать их
     canv.bind('<Button-1>', g1.fire2_start)
     canv.bind('<ButtonRelease-1>', g1.fire2_end)
     canv.bind('<Motion>', g1.targetting)
@@ -188,7 +189,7 @@ def new_game(event=''):
         g1.targetting()
         g1.power_up()
     canv.itemconfig(screen1, text='')
-    canv.delete(gun)
+    canv.delete( Gun )
     root.after(750, new_game)
 
 
