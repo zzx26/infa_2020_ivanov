@@ -5,6 +5,9 @@ import time
 
 # print (dir(math))
 
+
+width = 800
+height = 600
 root = tk.Tk()
 fr = tk.Frame(root)
 root.geometry('800x600')
@@ -25,6 +28,7 @@ class ball():
         self.r = 10
         self.vx = 0
         self.vy = 0
+        self.ax = 5
         self.color = choice(['blue', 'green', 'red', 'brown'])
         self.id = canv.create_oval(
                 self.x - self.r,
@@ -51,9 +55,13 @@ class ball():
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
-        # FIXME
+        if self.x < self.r or self.x + self.r > width:
+            self.vx = -self.vx
+        if self.y < self.r or self.y + self.r > height:
+            self.vy = -self.vy
         self.x += self.vx
         self.y -= self.vy
+        self.vx -= self.ax
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
