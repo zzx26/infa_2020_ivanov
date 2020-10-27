@@ -71,9 +71,11 @@ class Ball():
         Returns:
             Возвращает True в случае столкновения мяча и цели. В противном случае возвращает False.
         """
-        # FIXME
-        return False
-        #сделал функцию вытаскивания данных из хитбокса, с её помощью делай штуки
+        x_ext, y_ext, r_ext = obj.hitbox_data
+        if ((x_ext - self.x)**2 + (y_ext - self.y)**2)**0.5 <= r_ext + self.r:
+            return True
+        else:
+            return False
 
 
 class Gun():
@@ -81,7 +83,7 @@ class Gun():
         self.f2_power = 10
         self.f2_on = False
         self.an = 1
-        self.id = canv.create_line(20, 450, 50, 420, width=7) # FIXME: don't know how to set it...
+        self.id = canv.create_line(20, 450, 50, 420, width=7)
         self.balls = []
         self.bullet = 0
 
@@ -125,6 +127,12 @@ class Gun():
         else:
             canv.itemconfig(self.id, fill='black')
 
+    def balls_var(self):
+        return self.balls
+
+    def bullet_var(self):
+        return self.bullet
+
 
 class Target():
     def __init__(self):
@@ -132,9 +140,6 @@ class Target():
         self.score_value = 1
         self.live = 1
         self.id = canv.create_oval(0, 0 , 0 ,0)
-        # self.id_points = canv.create_text(30,30,text = self.score_value,font = '28')
-        # self.new_target()
-        # вытащи подсчет очков в отдельную штуку
 
     def new_target(self):
         """ Инициализация новой цели. """
@@ -143,7 +148,7 @@ class Target():
         self.r = rnd(2, 50)
         self.color = 'red'
         canv.coords(self.id, self.x-self.r, self.y-self.r, self.x+self.r, self.y+self.r)
-        canv.itemconfig(self.id, fill=color)
+        canv.itemconfig(self.id, fill=self.color)
 
     def hitbox_data(self):
         return self.x, self.y, self.r
@@ -151,48 +156,58 @@ class Target():
     def hit(self, points=1):
         """Попадание шарика в цель."""
         canv.coords(self.id, -10, -10, -10, -10)
-        # canv.itemconfig( self.id_points, text=self.score_value )
 
     def pull_score(self):
         return self.score_value
 
 
+class ScoreText():
+    def __init__(self):
+        self.score = 0
+        self.id_points = None
+
+    def draw_score(self):
+        self.id_points = canv.create_text(30, 30, text=self.score, font='28')
+
+    def score_change(self, obj):
+        self.score += obj.pull_score
+        canv.itemconfig(self.id_points, text=self.score)
+
+
 t1 = Target()
 screen1 = canv.create_text(400, 300, text='', font='28')
 g1 = Gun()
-
+score = ScoreText()
 
 
 def new_game(event=''):
-    global Gun, t1, screen1, balls, bullet
+    global t1, screen1
     t1.new_target()
-    bullet = 0
-    balls = []
-    # попытайся локализировать их
     canv.bind('<Button-1>', g1.fire2_start)
     canv.bind('<ButtonRelease-1>', g1.fire2_end)
     canv.bind('<Motion>', g1.targetting)
 
     z = 0.03
     t1.live = 1
-    while t1.live or balls:
-        for b in balls:
+    while t1.live or g1.balls_var():
+        for b in g1.balls_var:
             b.move()
-            if b.collision( t1 ) and t1.live:
+            if b.collision(t1) and t1.live:
+                score.score_change(t1)
                 t1.live = 0
                 t1.hit()
                 canv.bind('<Button-1>', '')
                 canv.bind('<ButtonRelease-1>', '')
-                canv.itemconfig(screen1, text='Вы уничтожили цель за ' + str(bullet) + ' выстрелов')
+                canv.itemconfig(screen1, text='Вы уничтожили цель за ' + str(g1.bullet_var) + ' выстрелов')
         canv.update()
         time.sleep(0.03)
         g1.targetting()
         g1.power_up()
     canv.itemconfig(screen1, text='')
-    canv.delete( Gun )
+    canv.delete(Gun)
     root.after(750, new_game)
 
 
 new_game()
 
-mainloop()
+root.mainloop()
