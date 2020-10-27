@@ -179,5 +179,4 @@ def new_game(event=''):
 
 
 new_game()
-
 root.mainloop()
